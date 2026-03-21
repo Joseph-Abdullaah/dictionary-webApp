@@ -1,8 +1,8 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import Word from "@/components/word"
 import WordSkeleton from "@/components/word-skeleton"
-import Noun from "@/components/noun"
-import NounSkeleton from "@/components/noun-skeleton"
+import Meanings from "@/components/meanings"
+import MeaningsSkeleton from "@/components/meanings-skeleton"
 import Source from "@/components/source"
 import SourceSkeleton from "@/components/source-skeleton"
 import type { DictionaryWord } from "@/types/formatDataTypes"
@@ -23,7 +23,7 @@ export function DictionaryEntry({
         {isLoading ? <WordSkeleton /> : <Word word={word} phonetic={phonetic} audio={audio} />}
 
         <div className="mt-8 space-y-10 md:mt-10">
-          {isLoading ? <NounSkeleton /> : <Noun meanings={meanings} />}
+          {isLoading ? <MeaningsSkeleton /> : <Meanings meanings={meanings} />}
         </div>
       </CardContent>
 
