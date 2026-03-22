@@ -46,14 +46,6 @@ function Container() {
             )}
           </section>
         </main>
-
-        <p className="text-[11px] text-muted-foreground">
-          Press{" "}
-          <kbd className="rounded-md border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-            d
-          </kbd>{" "}
-          to toggle dark mode.
-        </p>
       </div>
     </div>
   )
