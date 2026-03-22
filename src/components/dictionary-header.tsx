@@ -8,8 +8,12 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { MoonIcon } from "lucide-react"
+import { useThemeStore } from "@/store/themeStore"
 
 export function DictionaryHeader() {
+  const theme = useThemeStore((s) => s.theme)
+  const setTheme = useThemeStore((s) => s.setTheme)
+
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -36,7 +40,14 @@ export function DictionaryHeader() {
         <Separator orientation="vertical" className="h-6" />
 
         <div className="flex items-center gap-3">
-          <Switch size="default" aria-label="Toggle dark mode" />
+          <Switch
+            size="default"
+            aria-label="Toggle dark mode"
+            checked={theme === "dark"}
+            onCheckedChange={(checked) =>
+              setTheme(checked ? "dark" : "light")
+            }
+          />
           <MoonIcon className="h-5 w-5 text-muted-foreground" />
         </div>
       </div>
