@@ -1,60 +1,55 @@
-// export type RawPhonetic = {
-//   text?: string
-//   audio?: string
-//   sourceUrl?: string
-//   license?: { name?: string; url?: string }
-// }
+export interface RawLicense {
+  name?: string
+  url?: string
+}
 
-// export type RawDefinition = {
-//   definition: string
-//   example?: string
-//   synonyms?: string[]
-//   antonyms?: string[]
-// }
+export interface RawPhonetic {
+  text?: string
+  audio?: string
+  sourceUrl?: string
+  license?: RawLicense
+}
 
-// export type RawMeaning = {
-//   partOfSpeech?: string
-//   definitions?: RawDefinition[]
-//   synonyms?: string[]
-//   antonyms?: string[]
-// }
+export interface RawDefinition {
+  definition?: string
+  example?: string
+  synonyms?: string[]
+  antonyms?: string[]
+}
 
-// export type RawEntry = {
-//   word?: string
-//   phonetic?: string
-//   phonetics?: RawPhonetic[]
-//   meanings?: RawMeaning[]
-//   license?: { name?: string; url?: string }
-//   sourceUrls?: string[]
-// }
+export interface RawMeaning {
+  partOfSpeech?: string
+  definitions?: RawDefinition[]
+  synonyms?: string[]
+  antonyms?: string[]
+}
 
-// // Clean object your UI will use
-// export type CleanDefinition = {
-//   definition: string
-//   example?: string
-//   synonyms: string[]
-//   antonyms: string[]
-// }
+export interface RawEntry {
+  word?: string
+  phonetic?: string
+  phonetics?: RawPhonetic[]
+  meanings?: RawMeaning[]
+  license?: RawLicense
+  sourceUrls?: string[]
+}
 
-// export type CleanMeaning = {
-//   partOfSpeech: string
-//   definitions: CleanDefinition[]
-//   synonyms: string[] // aggregated meaning-level synonyms (if any)
-// }
+export interface License {
+  name: string
+  url: string
+}
 
-// export type CleanWord = {
-//   word: string
-//   phonetic?: string
-//   audio?: string
-//   meanings: CleanMeaning[]
-//   sourceUrls: string[]
-//   license?: { name?: string; url?: string }
-// }
+export interface Definition {
+  definition: string
+  example?: string
+  synonyms: string[]
+  antonyms: string[]
+}
 
-
-// types/api-dictionary.ts
-
-// export type ApiDictionaryResponse = DictionaryWord[]
+export interface Meaning {
+  partOfSpeech: string
+  synonyms: string[]
+  definitions: Definition[]
+}
 
 export interface DictionaryWord {
   word: string
@@ -65,20 +60,12 @@ export interface DictionaryWord {
   license?: License
 }
 
-export interface Meaning {
-  partOfSpeech: string
-  synonyms: string[]
-  definitions: Definition[]
-}
+export type CleanDefinition = Definition
+export type CleanMeaning = Meaning
+export type CleanWord = DictionaryWord
 
-export interface Definition {
-  definition: string
-  example?: string
-  synonyms: string[]
-  antonyms: string[]
-}
-
-export interface License {
-  name: string
-  url: string
+export interface DictionaryApiError {
+  title?: string
+  message?: string
+  resolution?: string
 }

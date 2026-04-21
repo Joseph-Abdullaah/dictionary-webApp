@@ -11,6 +11,15 @@ import { MoonIcon } from "lucide-react"
 import { useThemeStore } from "@/store/themeStore"
 import { useFontStore } from "@/store/fontStore"
 import type { FontType } from "@/types/fontTypes"
+const fontLabelMap: Record<FontType, string> = {
+  serif: "Serif",
+  sans: "Sans Serif",
+  mono: "Mono",
+}
+
+function isFontType(value: string): value is FontType {
+  return value === "serif" || value === "sans" || value === "mono"
+}
 
 export function DictionaryHeader() {
   const theme = useThemeStore((s) => s.theme)
@@ -28,14 +37,16 @@ export function DictionaryHeader() {
       </div>
 
       <div className="flex items-center gap-4 text-xs md:text-sm">
-        <Select onValueChange={(value: string) => setFont(value as FontType)}>
+        <Select
+          value={font}
+          onValueChange={(value) => {
+            if (isFontType(value)) {
+              setFont(value)
+            }
+          }}
+        >
           <SelectTrigger size="sm" className="min-w-24 justify-between">
-            <SelectValue
-              placeholder={
-                font.charAt(0).toUpperCase() +
-                font.slice(1).replace(/^[a-z]/, (m) => m.toUpperCase())
-              }
-            />
+            <SelectValue placeholder={fontLabelMap[font]} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="serif">Serif</SelectItem>

@@ -1,4 +1,29 @@
-import type { RawEntry, CleanWord, CleanMeaning, CleanDefinition } from "@/types/formatDataTypes"
+import type {
+  CleanDefinition,
+  CleanMeaning,
+  CleanWord,
+  License,
+  RawEntry,
+  RawLicense,
+} from "@/types/formatDataTypes"
+
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === "string" && value.trim().length > 0
+
+const toStringArray = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter(isNonEmptyString) : []
+
+function normalizeLicense(license: RawLicense | undefined): License | undefined {
+  if (!license) return undefined
+  if (!isNonEmptyString(license.name) || !isNonEmptyString(license.url)) {
+    return undefined
+  }
+
+  return {
+    name: license.name,
+    url: license.url,
+  }
+}
 
 /**
  * Transform the messy DictionaryAPI response (array) into a single CleanWord object.
@@ -6,60 +31,55 @@ import type { RawEntry, CleanWord, CleanMeaning, CleanDefinition } from "@/types
  */
 export function formatData(raw: unknown): CleanWord | null {
   if (!Array.isArray(raw) || raw.length === 0) return null
+  const firstEntry = raw[0]
+  if (!firstEntry || typeof firstEntry !== "object") return null
 
-  const entry = raw[0] as RawEntry
-  if (!entry) return null
+  const entry = firstEntry as RawEntry
+  if (!isNonEmptyString(entry.word)) return null
 
-  // word (required)
-  const word = entry.word ?? (typeof entry.phonetic === "string" ? entry.phonetic : undefined)
-  if (!word) return null
-
-  // phonetic text: prefer top-level `phonetic`, fall back to first phonetics.text
   const phonetic =
-    typeof entry.phonetic === "string"
+    isNonEmptyString(entry.phonetic)
       ? entry.phonetic
-      : entry.phonetics?.find((p) => !!p?.text)?.text
+      : entry.phonetics?.find((phoneticItem) => isNonEmptyString(phoneticItem?.text))?.text
 
-  // audio: prefer first phonetic with audio
-  const audio = entry.phonetics?.find((p) => !!p?.audio)?.audio
+  const audio = entry.phonetics?.find((phoneticItem) => isNonEmptyString(phoneticItem?.audio))
+    ?.audio
 
-  // meanings
   const meaningsRaw = Array.isArray(entry.meanings) ? entry.meanings : []
-  const meanings: CleanMeaning[] = meaningsRaw.map((m) => {
-    const part = m.partOfSpeech ?? "unknown"
+  const meanings: CleanMeaning[] = meaningsRaw
+    .map((meaning): CleanMeaning | null => {
+      const definitionsRaw = Array.isArray(meaning.definitions) ? meaning.definitions : []
+      const definitions: CleanDefinition[] = definitionsRaw
+        .map((definition): CleanDefinition | null => {
+          if (!isNonEmptyString(definition.definition)) return null
 
-    const defsRaw = Array.isArray(m.definitions) ? m.definitions : []
-    const definitions: CleanDefinition[] = defsRaw.map((d) => ({
-      definition: d.definition ?? "",
-      example: d.example,
-      synonyms: Array.isArray(d.synonyms) ? d.synonyms : [],
-      antonyms: Array.isArray(d.antonyms) ? d.antonyms : [],
-    }))
+          return {
+            definition: definition.definition,
+            example: isNonEmptyString(definition.example) ? definition.example : undefined,
+            synonyms: toStringArray(definition.synonyms),
+            antonyms: toStringArray(definition.antonyms),
+          }
+        })
+        .filter((definition): definition is CleanDefinition => definition !== null)
 
-    // merge meaning-level synonyms (if present) with synonyms from individual definitions (optional)
-    const meaningSynonyms = Array.isArray(m.synonyms) ? m.synonyms : []
+      if (definitions.length === 0) return null
 
-    return {
-      partOfSpeech: part,
-      definitions,
-      synonyms: meaningSynonyms,
-    }
-  })
+      return {
+        partOfSpeech: isNonEmptyString(meaning.partOfSpeech) ? meaning.partOfSpeech : "unknown",
+        definitions,
+        synonyms: toStringArray(meaning.synonyms),
+      }
+    })
+    .filter((meaning): meaning is CleanMeaning => meaning !== null)
 
-  // sourceUrls (some responses include this at root)
-  const sourceUrls = Array.isArray(entry.sourceUrls) ? entry.sourceUrls : []
-
-  // license if present
-  const license = entry.license ? { name: entry.license.name, url: entry.license.url } : undefined
-
-  const clean: CleanWord = {
-    word,
-    phonetic: phonetic ?? undefined,
-    audio: audio ?? undefined,
+  const cleanWord: CleanWord = {
+    word: entry.word,
+    phonetic: isNonEmptyString(phonetic) ? phonetic : undefined,
+    audio: isNonEmptyString(audio) ? audio : undefined,
     meanings,
-    sourceUrls,
-    license,
+    sourceUrls: toStringArray(entry.sourceUrls),
+    license: normalizeLicense(entry.license),
   }
 
-  return clean
+  return cleanWord
 }

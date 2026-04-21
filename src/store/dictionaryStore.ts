@@ -1,17 +1,17 @@
 import { create } from "zustand"
 
 interface DictionaryState {
-    Input: string
-    word: string
-    setInput: (searchInput: string) => void
-    setWord: (word: string) => void
+  input: string
+  word: string
+  setInput: (input: string) => void
+  setWord: (word: string) => void
 }
 
 const useDictionaryStore = create<DictionaryState>((set) => ({
-    Input: "",
-    word: "",
-    setInput: (Input) => set({ Input }),
-    setWord: (word) => set({ word }),
+  input: "",
+  word: "",
+  setInput: (input) => set({ input }),
+  setWord: (word) => set({ word }),
 }))
 
-export default useDictionaryStore;
+export default useDictionaryStore

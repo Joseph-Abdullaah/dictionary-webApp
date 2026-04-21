@@ -6,7 +6,7 @@ const FONT_STORAGE_KEY = "dictionary-font"
 function readStoredFont(): FontType {
   if (typeof window === "undefined") return "sans"
   const v = localStorage.getItem(FONT_STORAGE_KEY)
-  if (v === "serif" || v === "sans" || v === "mono") return v as FontType
+  if (v === "serif" || v === "sans" || v === "mono") return v
   return "sans"
 }
 

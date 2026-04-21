@@ -4,15 +4,15 @@ import { DictionaryEntry } from "@/components/dictionary-entry.tsx"
 import useDictionaryStore from "@/store/dictionaryStore"
 import { useWordQuery } from "@/hooks/useWordQuery"
 import { formatData } from "@/utils/formatData"
-import EmtyState from "@/components/emtyState"
+import EmptyState from "@/components/emptyState"
 import ErrorState from "@/components/errorState"
 
 function Container() {
-  const { Input, setInput, word } = useDictionaryStore()
+  const { input, setInput, word } = useDictionaryStore()
   const setWord = useDictionaryStore((state) => state.setWord)
   const { data, isLoading, isError, error } = useWordQuery(word)
   const formatted = formatData(data)
-  const word2 = formatted?.word ?? ""
+  const displayWord = formatted?.word ?? ""
   const phonetic = formatted?.phonetic
   const audio = formatted?.audio
   const meanings = formatted?.meanings ?? []
@@ -25,7 +25,7 @@ function Container() {
         <DictionaryHeader />
 
         <section className="mt-2">
-          <DictionarySearch input={Input} setInput={setInput} setWord={() => setWord(Input)} />
+          <DictionarySearch input={input} setInput={setInput} setWord={() => setWord(input)} />
         </section>
 
         <main className="space-y-8 md:space-y-10">
@@ -33,10 +33,10 @@ function Container() {
             {isError && !isSearchEmpty ? (
               <ErrorState error={error} />
             ) : isSearchEmpty ? (
-              <EmtyState />
+              <EmptyState />
             ) : (
               <DictionaryEntry
-                word={word2}
+                word={displayWord}
                 phonetic={phonetic}
                 audio={audio}
                 meanings={meanings}
